@@ -35,6 +35,6 @@ public class TeamStringConverter implements Converter<Team> {
 
     @Override
     public WriteCellData<?> convertToExcelData(Team value, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) throws Exception {
-        return new WriteCellData<>(JacksonUtils.toJson(value));
+        return new WriteCellData<>(CellDataTypeEnum.STRING, JacksonUtils.toJson(value));
     }
 }

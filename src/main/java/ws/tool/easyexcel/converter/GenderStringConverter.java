@@ -49,6 +49,6 @@ public class GenderStringConverter implements Converter<Gender> {
     public WriteCellData<?> convertToExcelData(Gender value, ExcelContentProperty contentProperty,
                                                GlobalConfiguration globalConfiguration) {
 
-        return new WriteCellData<>(value.toString());
+        return new WriteCellData<>(CellDataTypeEnum.STRING, value.name());
     }
 }

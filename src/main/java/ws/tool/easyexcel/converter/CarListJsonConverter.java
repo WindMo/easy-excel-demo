@@ -39,6 +39,6 @@ public class CarListJsonConverter implements Converter<List<Car>> {
 
     @Override
     public WriteCellData<?> convertToExcelData(List<Car> value, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) throws Exception {
-        return new WriteCellData<>(JacksonUtils.toJson(value));
+        return new WriteCellData<>(CellDataTypeEnum.STRING, JacksonUtils.toJson(value));
     }
 }

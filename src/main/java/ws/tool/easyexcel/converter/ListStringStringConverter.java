@@ -37,6 +37,6 @@ public class ListStringStringConverter implements Converter<List<String>> {
 
     @Override
     public WriteCellData<?> convertToExcelData(List<String> value, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) throws Exception {
-        return new WriteCellData<>(JacksonUtils.toJson(value));
+        return new WriteCellData<>(CellDataTypeEnum.STRING, JacksonUtils.toJson(value));
     }
 }

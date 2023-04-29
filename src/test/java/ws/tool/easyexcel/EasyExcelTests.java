@@ -1,8 +1,6 @@
 package ws.tool.easyexcel;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.read.listener.ReadListener;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,7 @@ public class EasyExcelTests {
 
         if (!useFile) {
 
-            in = new ByteArrayInputStream(((ByteArrayOutputStream)out).toByteArray());
+            in = new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
         }
     }
 
