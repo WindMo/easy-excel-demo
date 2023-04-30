@@ -6,10 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ResourceUtils;
 import ws.tool.easyexcel.listener.BatchReadListener;
-import ws.tool.easyexcel.pojo.BasicView;
-import ws.tool.easyexcel.pojo.Car;
-import ws.tool.easyexcel.pojo.Gender;
-import ws.tool.easyexcel.pojo.Team;
+import ws.tool.easyexcel.pojo.*;
 
 import java.io.*;
 import java.util.*;
@@ -53,6 +50,7 @@ public class EasyExcelTests {
             view.setName("name-" + id);
             view.setOk(i % 2 == 0);
             view.setGender(i % 2 == 0 ? Gender.FEMALE : Gender.MALE);
+            view.setLanguage(i % 2 == 0 ? Language.CHINESE : Language.ENGLISH);
             view.setEmails(Arrays.asList(id + "-e@ws.com", id + "-x@ws.com"));
             view.setDate(new Date(System.currentTimeMillis()));
 
@@ -64,7 +62,7 @@ public class EasyExcelTests {
             cars.add(new Car(id + "-carB", "red"));
             view.setCars(cars);
 
-            view.setIgnore(1L);
+            view.setIgnore(new Object());
         }
 
         if (useFile) {

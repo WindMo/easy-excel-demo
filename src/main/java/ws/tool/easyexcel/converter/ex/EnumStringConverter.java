@@ -2,6 +2,7 @@ package ws.tool.easyexcel.converter.ex;
 
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
+import com.alibaba.excel.exception.ExcelRuntimeException;
 import com.alibaba.excel.metadata.GlobalConfiguration;
 import com.alibaba.excel.metadata.data.ReadCellData;
 import com.alibaba.excel.metadata.data.WriteCellData;
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 枚举与其名称之间的转换器
+ * 扩展，枚举与其名称之间的转换器
  *
  * @author WindShadow
  * @version 2023-04-29.
@@ -22,18 +23,15 @@ public class EnumStringConverter implements Converter<Enum<?>> {
 
     private static final Map<Class<?>, Method> METHOD_CACHE = new ConcurrentHashMap<>();
 
-    private static Method findValueOfMethod(Class<Enum<?>> enumClass) throws NoSuchMethodException {
+    private static Method findValueOfMethod(Class<Enum<?>> enumClass) {
 
-        Method m;
-        if (METHOD_CACHE.containsKey(enumClass)) {
-
-            m = METHOD_CACHE.get(enumClass);
-        } else {
-
-            m = enumClass.getMethod("valueOf", String.class);
-            METHOD_CACHE.put(enumClass, m);
-        }
-        return m;
+        return METHOD_CACHE.computeIfAbsent(enumClass, key -> {
+            try {
+                return key.getMethod("valueOf", String.class);
+            } catch (NoSuchMethodException e) {
+                throw new ExcelRuntimeException("This class [" + enumClass.getName() + "] may not be an enumeration class", e);
+            }
+        });
     }
 
     /**

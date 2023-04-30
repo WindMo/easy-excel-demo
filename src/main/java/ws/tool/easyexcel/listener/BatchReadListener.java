@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -20,12 +21,12 @@ import java.util.function.Consumer;
 public class BatchReadListener<T> implements ReadListener<T> {
 
     private List<T> cache;
-    private final int limit;
+    private final int batchSize;
     private final Consumer<List<T>> processor;
 
-    public BatchReadListener(int limit, Consumer<List<T>> processor) {
-        this.limit = limit;
-        this.processor = processor;
+    public BatchReadListener(int batchSize, Consumer<List<T>> processor) {
+        this.batchSize = batchSize;
+        this.processor = Objects.requireNonNull(processor);
         reset();
     }
 
@@ -45,7 +46,7 @@ public class BatchReadListener<T> implements ReadListener<T> {
     public void invoke(T data, AnalysisContext context) {
 
         cache.add(data);
-        if (cache.size() >= limit) {
+        if (cache.size() >= batchSize) {
 
             log.info("批处理");
             processor.accept(cache);
@@ -62,7 +63,9 @@ public class BatchReadListener<T> implements ReadListener<T> {
     public void doAfterAllAnalysed(AnalysisContext context) {
 
         log.info("读取完毕");
-        processor.accept(cache);
+        if (!cache.isEmpty()) {
+            processor.accept(cache);
+        }
     }
 
     /**
@@ -74,7 +77,6 @@ public class BatchReadListener<T> implements ReadListener<T> {
      */
     @Override
     public void onException(Exception exception, AnalysisContext context) throws Exception {
-        ReadListener.super.onException(exception, context);
 
         log.error("解析失败，但是继续解析下一行:{}", exception.getMessage());
         // 如果是某一个单元格的转换异常 能获取到具体行号

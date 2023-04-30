@@ -81,6 +81,12 @@ public class BasicView {
     private Gender gender;
 
     /**
+     * 指定自定义枚举转换器，不使用单类型转换器
+     */
+    @ExcelProperty(converter = EnumStringConverter.class)
+    private Language language;
+
+    /**
      * 指定集合转换器，每个类型的集合都要写一遍，目前官方的转换器没有针对集合的优化
      */
     @ExcelProperty(converter = ListStringStringConverter.class)
