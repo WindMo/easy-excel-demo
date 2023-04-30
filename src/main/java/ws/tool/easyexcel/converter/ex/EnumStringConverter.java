@@ -71,7 +71,7 @@ public class EnumStringConverter implements Converter<Enum<?>> {
 
     @Override
     public WriteCellData<?> convertToExcelData(Enum<?> value, ExcelContentProperty contentProperty,
-                                               GlobalConfiguration globalConfiguration) {
+                                               GlobalConfiguration globalConfiguration) throws Exception {
 
         return new WriteCellData<>(CellDataTypeEnum.STRING, value.name());
     }

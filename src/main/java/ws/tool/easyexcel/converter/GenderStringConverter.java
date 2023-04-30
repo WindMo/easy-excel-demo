@@ -38,7 +38,7 @@ public class GenderStringConverter implements Converter<Gender> {
 
     @Override
     public Gender convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty,
-                                     GlobalConfiguration globalConfiguration) throws Exception {
+                                    GlobalConfiguration globalConfiguration) throws Exception {
 
         String value = cellData.getStringValue();
         return Gender.valueOf(value);
@@ -47,7 +47,7 @@ public class GenderStringConverter implements Converter<Gender> {
 
     @Override
     public WriteCellData<?> convertToExcelData(Gender value, ExcelContentProperty contentProperty,
-                                               GlobalConfiguration globalConfiguration) {
+                                               GlobalConfiguration globalConfiguration) throws Exception {
 
         return new WriteCellData<>(CellDataTypeEnum.STRING, value.name());
     }

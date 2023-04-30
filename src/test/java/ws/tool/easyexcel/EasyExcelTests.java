@@ -1,6 +1,7 @@
 package ws.tool.easyexcel;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.util.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import ws.tool.easyexcel.listener.BatchReadListener;
 import ws.tool.easyexcel.pojo.*;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -22,8 +25,8 @@ public class EasyExcelTests {
     private static String file = "D:\\program\\JAVA\\项目\\easy-excel-demo\\easy-excel-demo\\src\\test\\excel-out\\ex.xlsx";
     private static String img = "classpath:img/idea.png";
 
-    private static InputStream in;
-    private static OutputStream out;
+    private static InputStream inputStream;
+    private static OutputStream outputStream;
 
     private static boolean useFile = false;
 
@@ -31,12 +34,35 @@ public class EasyExcelTests {
 
         if (!useFile) {
 
-            in = new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
+            inputStream = new ByteArrayInputStream(((ByteArrayOutputStream) outputStream).toByteArray());
+        }
+    }
+
+    static InputStream in() throws IOException {
+
+
+        if (useFile) {
+
+            return Files.newInputStream(Paths.get(file));
+        } else {
+
+            return inputStream;
+        }
+    }
+
+    static OutputStream out() throws IOException {
+
+        if (useFile) {
+
+            return Files.newOutputStream(Paths.get(file));
+        } else {
+
+            return outputStream;
         }
     }
 
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll() throws IOException {
 
         views = new ArrayList<>();
 
@@ -54,7 +80,7 @@ public class EasyExcelTests {
             view.setEmails(Arrays.asList(id + "-e@ws.com", id + "-x@ws.com"));
             view.setDate(new Date(System.currentTimeMillis()));
 
-            view.setImage(readFileResource(img));
+            view.setImage(FileUtils.readFileToByteArray(ResourceUtils.getFile(img)));
             view.setTeam(new Team(id + "-teamId", id + "-teamName"));
 
             List<Car> cars = new ArrayList<>();
@@ -68,30 +94,31 @@ public class EasyExcelTests {
         if (useFile) {
 
             try {
-                in = new FileInputStream(file);
-                out = new FileOutputStream(file);
+                inputStream = Files.newInputStream(Paths.get(file));
+                outputStream = Files.newOutputStream(Paths.get(file));
+                outputStream = new FileOutputStream(file);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
         } else {
 
-            out = new ByteArrayOutputStream();
+            outputStream = new ByteArrayOutputStream();
         }
     }
 
     @Test
-    void readAndWriteTest() {
+    void readAndWriteTest() throws IOException {
 
         String sheetName = "EasyExcelSheet";
         // 使用 BasicView 属性作为head
-        EasyExcel.write(out, BasicView.class)
+        EasyExcel.write(out(), BasicView.class)
                 .sheet(sheetName)
                 .doWrite(views);
 
         synStream();
 
         // 同步读，一次性读到内存
-        List<BasicView> readList = EasyExcel.read(in)
+        List<BasicView> readList = EasyExcel.read(in())
                 .head(BasicView.class)
                 .sheet(sheetName)
                 .doReadSync();
@@ -101,30 +128,9 @@ public class EasyExcelTests {
 
         // 监听器读，ReadListener 注意线程安全问题
         List<BasicView> batchReadList = new LinkedList<>();
-        EasyExcel.read(in, BasicView.class, new BatchReadListener<BasicView>(2, batchReadList::addAll))
+        EasyExcel.read(in(), BasicView.class, new BatchReadListener<BasicView>(2, batchReadList::addAll))
                 .sheet(sheetName)
                 .doRead();
         Assertions.assertEquals(views, batchReadList);
-    }
-
-    private static byte[] readFileResource(String res) {
-
-        try {
-            return readAll(new FileInputStream(ResourceUtils.getFile(res)));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static byte[] readAll(InputStream inputStream) {
-
-        try {
-            int available = inputStream.available();
-            byte[] bytes = new byte[available];
-            inputStream.read(bytes);
-            return bytes;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
